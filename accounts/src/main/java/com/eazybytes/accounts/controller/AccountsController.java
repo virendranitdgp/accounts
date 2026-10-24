@@ -3,21 +3,25 @@ package com.eazybytes.accounts.controller;
 import com.eazybytes.accounts.dto.CustomerDto;
 import com.eazybytes.accounts.dto.ResponseDto;
 import com.eazybytes.accounts.service.IAccountService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @AllArgsConstructor
+@Validated
 public class AccountsController {
 
     private IAccountService iAccountService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseDto> createAccount(@RequestBody CustomerDto customerDto) {
+    public ResponseEntity<ResponseDto> createAccount(@RequestBody @Valid CustomerDto customerDto) {
         iAccountService.createAccount(customerDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -25,7 +29,7 @@ public class AccountsController {
     }
 
     @GetMapping("/fetch")
-    public ResponseEntity<CustomerDto> fetchAccountDetails(@RequestParam String mobileNumber) {
+    public ResponseEntity<CustomerDto> fetchAccountDetails(@RequestParam @Pattern(regexp = "^[0-9]{10}$") String mobileNumber) {
         CustomerDto customerDto = iAccountService.fetchAccountDetails(mobileNumber);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -33,7 +37,7 @@ public class AccountsController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseDto> updateAccount(@RequestBody CustomerDto customerDto) {
+    public ResponseEntity<ResponseDto> updateAccount(@RequestBody @Valid CustomerDto customerDto) {
        boolean isUpdate= iAccountService.updateAccount(customerDto);
        if (isUpdate) {
            return ResponseEntity
@@ -47,7 +51,7 @@ public class AccountsController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam String mobileNumber) {
+    public ResponseEntity<ResponseDto> deleteAccount(@RequestParam  @Pattern(regexp = "^[0-9]{10}$") String mobileNumber) {
         boolean isDeleted = iAccountService.deleteAccount(mobileNumber);
         if (isDeleted) {
             return ResponseEntity
